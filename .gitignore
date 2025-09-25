@@ -1,0 +1,25 @@
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# IDEs
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Java
+*.class
+
+# Docker
+**/build/

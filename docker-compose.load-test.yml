@@ -1,0 +1,50 @@
+# Docker Compose override for load testing with high volume
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.load-test.yml up -d
+
+version: "3.9"
+services:
+  # Scale up for high load testing
+  alert-trigger-service:
+    deploy:
+      replicas: 5
+    environment:
+      - USER_SERVICE_BASE_URL=http://user-service:8081
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - ALERT_THRESHOLD_PERCENT=80
+      - SERVER_PORT=8082
+
+  notification-service:
+    deploy:
+      replicas: 3
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_CONSUMER_GROUP_ID=notification-service
+      - SERVER_PORT=8083
+    # Remove ports mapping - services communicate internally via Docker network
+
+  user-service:
+    deploy:
+      replicas: 3
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/telco
+      - SPRING_DATASOURCE_USERNAME=telco
+      - SPRING_DATASOURCE_PASSWORD=telco
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SERVER_PORT=8081
+
+  # Add Kafka scaling for high throughput
+  kafka:
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # High throughput settings
+      KAFKA_NUM_NETWORK_THREADS: 8
+      KAFKA_NUM_IO_THREADS: 16
+      KAFKA_SOCKET_SEND_BUFFER_BYTES: 102400
+      KAFKA_SOCKET_RECEIVE_BUFFER_BYTES: 102400
+      KAFKA_SOCKET_REQUEST_MAX_BYTES: 104857600
