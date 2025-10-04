@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alert-trigger-service
+  namespace: telco-system
+  labels:
+    app: alert-trigger-service
+spec:
+  replicas: 2  # Start with 2 replicas
+  selector:
+    matchLabels:
+      app: alert-trigger-service
+  template:
+    metadata:
+      labels:
+        app: alert-trigger-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8082"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      containers:
+      - name: alert-trigger-service
+        image: telco/alert-trigger-service:latest
+        ports:
+        - containerPort: 8082
+        env:
+        - name: USER_SERVICE_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: telco-config
+              key: USER_SERVICE_BASE_URL
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: telco-config
+              key: KAFKA_BOOTSTRAP_SERVERS
+        - name: ALERT_THRESHOLD_PERCENT
+          valueFrom:
+            configMapKeyRef:
+              name: telco-config
+              key: ALERT_THRESHOLD_PERCENT
+        - name: SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: telco-config
+              key: ALERT_SERVICE_PORT
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8082
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8082
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alert-trigger-service
+  namespace: telco-system
+  labels:
+    app: alert-trigger-service
+spec:
+  selector:
+    app: alert-trigger-service
+  ports:
+  - port: 8082
+    targetPort: 8082
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: alert-trigger-service-hpa
+  namespace: telco-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: alert-trigger-service
+  minReplicas: 1
+  maxReplicas: 8  # Can scale higher for alert processing
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+      - type: Percent
+        value: 200
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60

@@ -1,0 +1,103 @@
+# Test Environment
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: telco_test
+      POSTGRES_PASSWORD: telco_test
+      POSTGRES_DB: telco_test
+    ports:
+      - "5433:5432" # Different port to avoid conflicts
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U telco_test" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2182:2181" # Different port to avoid conflicts
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9095:9094" # Different port to avoid conflicts
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9095
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  user-service:
+    build:
+      context: ./user-service
+      args:
+        JAVA_VERSION: 21
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/telco_test
+      SPRING_DATASOURCE_USERNAME: telco_test
+      SPRING_DATASOURCE_PASSWORD: telco_test
+      SERVER_PORT: 8081
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/api/v1/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  alert-trigger-service:
+    build:
+      context: ./alert-trigger-service
+      args:
+        JAVA_VERSION: 21
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      USER_SERVICE_BASE_URL: http://user-service:8081/api/v1
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ALERT_THRESHOLD_PERCENT: 80
+      SERVER_PORT: 8082
+    ports:
+      - "8082:8082"
+    depends_on:
+      - user-service
+      - kafka
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  notification-service:
+    build:
+      context: ./notification-service
+      args:
+        JAVA_VERSION: 21
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONSUMER_GROUP_ID: notification-service
+      SERVER_PORT: 8083
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kafka
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3

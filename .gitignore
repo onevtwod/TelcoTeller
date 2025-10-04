@@ -1,25 +1,337 @@
-# Maven
-/target/
-!.mvn/wrapper/maven-wrapper.jar
-.mvn/timing.properties
-
-# IDEs
-.idea/
-*.iml
-.project
-.classpath
-.settings/
-.vscode/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Java
+# Compiled class files
 *.class
 
+# Log files
+*.log
+logs/
+log/
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
 # Docker
-**/build/
+.dockerignore
+
+# Environment variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging.local
+*.env
+secrets/
+secrets.json
+config/secrets/
+application-secrets.properties
+application-local.properties
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+data/
+database/
+
+# Logs and monitoring
+logs/
+*.log
+*.log.*
+monitoring/
+grafana-data/
+prometheus-data/
+
+# Test results
+test-results/
+coverage/
+jacoco/
+target/site/
+target/surefire-reports/
+target/failsafe-reports/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Application specific
+application-local.properties
+application-secrets.properties
+application-prod.properties
+application-staging.properties
+application-dev.properties
+application-test.properties
+
+# Docker volumes
+postgres_data/
+postgres_dev_data/
+postgres_staging_data/
+postgres_prod_data/
+
+# Kubernetes secrets
+k8s/secrets/
+k8s/*-secret.yaml
+k8s/*-secrets.yaml
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+ssl/
+certs/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Runtime files
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local development
+local/
+dev-local/
+staging-local/
+prod-local/
+
+# Performance testing
+load-test-results/
+performance-results/
+benchmark-results/
+
+# Security scanning results
+security-scan-results/
+vulnerability-reports/
+owasp-reports/
+
+# Documentation build
+docs/_build/
+docs/build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Project specific
+scaling_comparison_results/
+load_test_results/
+performance_results/
+monitoring_data/
+alert_data/
+notification_data/
+user_data/
+usage_data/

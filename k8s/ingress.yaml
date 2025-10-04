@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: telco-ingress
+  namespace: telco-system
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rate-limit: "10"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  rules:
+  - host: telco.local
+    http:
+      paths:
+      - path: /api/users
+        pathType: Prefix
+        backend:
+          service:
+            name: user-service
+            port:
+              number: 8081
+      - path: /api/alerts
+        pathType: Prefix
+        backend:
+          service:
+            name: alert-trigger-service
+            port:
+              number: 8082
+      - path: /api/notifications
+        pathType: Prefix
+        backend:
+          service:
+            name: notification-service
+            port:
+              number: 8083
+      - path: /health
+        pathType: Exact
+        backend:
+          service:
+            name: user-service
+            port:
+              number: 8081
